@@ -67,8 +67,11 @@ function createPointMap() {
 	createPoint(200,200);
 	createPoint(300,200);
 	createPoint(400,200);
-	createPoint(500,200);
-//	createPoint(400,400);
+	createPoint(400,300);
+	createPoint(400,400);
+	createPoint(300,400);
+	createPoint(200,400);
+	createPoint(100,400);
 }
 
 createPointMap();
@@ -91,11 +94,14 @@ function drawConnectorLines() {
 creepList = [];
 
 class Creep {
-	constructor (x,y,width,height,fillColor) {
+	constructor (x,y,width,height,fillColor,ID) {
 		this.x = x;
 		this.y = y;
 		this.width = width;
 		this.height = height;
+
+		this.ID = ID;
+		this.ID = 0;
 
 		this.width = 10;
 		this.height = 10;
@@ -104,6 +110,12 @@ class Creep {
 		this.fillColor = 'white';
 
 		this.colliding = false;
+
+		this.onPointID = 0;
+		this.nextPointID = 0;
+
+		this.velX = 0;
+		this.velY = 0;
 	}
 	drawCreep() {
 		ctx.beginPath();
@@ -111,13 +123,60 @@ class Creep {
 		ctx.fillStyle = this.fillColor;
 		ctx.fill();
 		ctx.stroke();
+
+		ctx.font = '10px Arial';
+		ctx.fillStyle = 'black';
+		ctx.fillText (this.ID, this.x + this.width + 3, this.y - 10);
+		ctx.fillText (this.onPointID + ' . ' + this.nextPointID, this.x + this.width + 3, this.y);
+		ctx.fillStyle = this.fillColor;
 	}
 	moveCreep() {
-		this.x += 1;
+		this.x += this.velX;
+		this.y += this.velY;
+	}
+	nodeFinalCheck () {
+		if (this.nextPointID == pointList.length) {
+			this.velX = 0;
+			this.velY = 0;
+			this.killMe();
+			return;
+		}
+		else {1
+		this.checkNextNode();
+		}
+	}
+	checkNextNode() {
+		this.nextPointID = this.onPointID + 1;
+		this.nextPoint = pointList[this.nextPointID];
+
+		if (this.nextPoint.x > this.x) {
+			this.velX = 1;
+			this.velY = 0;
+		}
+		if (this.nextPoint.y > this.y && this.x+this.width/2 >= 				this.nextPoint.centerX) {
+			this.velX = 0;
+			this.velY = 1;
+		}
+		if (this.nextPoint.x < this.x && this.y+this.height/2 >= 		this.nextPoint.centerY) {
+			this.velX = -1;
+			this.velY = 0;
+		}
+
+
+	}
+	getID () {
+		var creepID = creepList.indexOf(this);
+		this.ID = creepID;
+	}
+	killMe() {
+		var creepID = this.ID;
+		creepList.splice(creepID,1);
 	}
 	updateCreep() {
+		this.getID();
 		this.moveCreep();
-//		this.checkPoint();
+		this.nodeFinalCheck();
+//		this.checkNextNode();
 	}
 }
 
@@ -132,6 +191,7 @@ function updateCreeps() {
 function createCreep(x,y) {
 	var creep = new Creep (x,y);
 	creepList.push(creep);
+//	creep.ID = creepList.indexOf(creep);
 }
 
 function spawnCreeps() {
@@ -151,11 +211,13 @@ function checkCols () {
 		var rect1 = creepList[i];
 		for (j=0;j<pointList.length;j++) {
 			var rect2 = pointList[j];
+			var pointID = pointList.indexOf(rect2);
 			if (rect1.x < rect2.x + rect2.width &&
    				rect1.x + rect1.width > rect2.x &&
    				rect1.y < rect2.y + rect2.height &&
    				rect1.y + rect1.height > rect2.y) {
 				rect1.fillColor = 'red';
+				rect1.onPointID = pointID;
 				break;
 			}
 			else {
