@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html>
+<canvas id = 'canvas' width = '600' height = '600' style = 'border:1px solid #000000'></canvas>
+<script>
+var canvas = document.getElementById('canvas');
+var ctx = canvas.getContext('2d');
+
+///// UPDATE ALL /////
+
+function updateAll () {
+	ctx.clearRect(0,0,canvas.width,canvas.height);
+	updatePoints();
+	drawConnectorLines();
+	updateCreeps();
+	checkCols();
+}
+
+var gameRunning = false;
+
+
+setInterval(updateAll,20);
+
+
+///////////////////////
+
+///// Event Listeners /////
+
+document.addEventListener('keydown',keydown)
+
+function keydown(evt) {
+	if (evt.keyCode == 32) {
+		console.log('spacebar pressed');
+		if (gameRunning == false) {
+//			start();
+		}
+		console.log(creepList.length);
+	}
+	if (evt.keyCode == 49) {
+		spawnCreeps();
+	}
+}
+ 
+
+////////////////////////////
+
+///// Points ///////////////
+
+pointList = [];
+
+class Point {
+	constructor (x,y,width,height) {
+		this.x = x;
+		this.y = y;
+
+		this.width = width;
+		this.height = height;
+
+		this.width = 40;
+		this.height =40;
+
+		this.centerX = this.x+this.width / 2;
+		this.centerY = this.y+this.height / 2;
+	}
+	drawPoint() {
+		ctx.beginPath();
+		ctx.rect(this.x,this.y,this.width, this.height);
+		ctx.stroke();
+	}
+}
+
+function updatePoints() {
+	for (i=0;i<pointList.length;i++) {
+		pointList[i].drawPoint();
+	}
+}
+
+function createPoint(x,y) {
+	var point = new Point (x,y);
+	pointList.push(point);
+}
+
+function createPointMap() {
+	createPoint(200,200);
+	createPoint(300,200);
+	createPoint(400,200);
+	createPoint(500,200);
+//	createPoint(400,400);
+}
+
+createPointMap();
+
+function drawConnectorLines() {
+	for (i=0;i<pointList.length-1;i++) {
+		var point1 = pointList[i];
+		var point2 = pointList[i+1];
+		ctx.beginPath();
+		ctx.moveTo(point1.centerX,point1.centerY);
+		ctx.lineTo(point2.centerX,point2.centerY);
+		ctx.stroke();
+	}
+}
+
+/////////////////////////////
+
+/////// Creeps //////////////
+
+creepList = [];
+
+class Creep {
+	constructor (x,y,width,height,fillColor) {
+		this.x = x;
+		this.y = y;
+		this.width = width;
+		this.height = height;
+
+		this.width = 10;
+		this.height = 10;
+
+		this.fillColor = fillColor;
+		this.fillColor = 'white';
+	}
+	drawCreep() {
+		ctx.beginPath();
+		ctx.rect(this.x,this.y,this.width,this.height);
+		ctx.fillStyle = this.fillColor;
+		ctx.fill();
+		ctx.stroke();
+	}
+	moveCreep() {
+		this.x += 1;
+	}
+	updateCreep() {
+		this.moveCreep();
+//		this.checkPoint();
+	}
+}
+
+function updateCreeps() {
+	for (i=0;i<creepList.length;i++) {
+		creepList[i].drawCreep();
+		creepList[i].updateCreep();
+
+	}
+}
+
+function createCreep(x,y) {
+	var creep = new Creep (x,y);
+	creepList.push(creep);
+}
+
+function spawnCreeps() {
+	var creepSpawnX = pointList[0].centerX;
+	var creepSpawnY = pointList[0].centerY;
+	createCreep(creepSpawnX-5,creepSpawnY-5);
+}
+
+
+/////////////////////////////////////////////////////
+
+///////////  COLS   //////////////////////
+
+
+function checkCols () {
+	for (i=0;i<creepList.length;i++) {
+		let rect1 = creepList[i];
+		for (j=0;j<pointList.length;j++) {
+			let rect2 = pointList[i];
+			if (rect1.x < rect2.x + rect2.width &&
+   				rect1.x + rect1.width > rect2.x &&
+   				rect1.y < rect2.y + rect2.height &&
+   				rect1.y + rect1.height > rect2.y) {
+				rect1.fillColor = 'red';
+			}
+			else {
+				rect1.fillColor = 'white';
+			}
+		}
+	}
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</script>
+</html>
