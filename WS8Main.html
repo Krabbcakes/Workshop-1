@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html>
+<canvas id = 'canvas' width = '600' height="600" style="border:1px solid #000000"></canvas>
+<script src = 'points.js'></script>
+<script src = 'creeps.js'></script>
+<script>
+var canvas = document.getElementById('canvas');
+var ctx = canvas.getContext('2d');
+
+var cvw = canvas.width;
+var cvh = canvas.height;
+
+var creepWidth = 10;
+var creepHeight = 10;
+
+var creepsCreated = 0;
+var reachedEnd = 0;
+
+pointList = [];
+creepList = [];
+
+function init () {
+    createPointMap();
+    start();
+}
+
+init();
+
+function start() {
+    setInterval(updateAll,20);
+}
+
+function updateAll() {
+    ctx.clearRect(0,0,cvw,cvh);
+    updatePoints();
+    drawConnectorLines();
+    updateCreeps();
+    checkPointCollision();
+    showInfo();
+}
+
+document.addEventListener('keydown',keydown);
+
+function keydown(evt) {
+    if (evt.keyCode == 32) {
+        console.log ('spacebar pressed');
+        
+    }
+    if(evt.keyCode == 49) {
+        console.log ('1 pressed');
+        createCreep(pointList[0].centerX - creepWidth/2,pointList[0].centerY - creepHeight/2);
+    }
+}
+
+function showInfo() {
+    write ('creepsCreated: ' + creepsCreated, 250,35);
+    write('reachedEnd: ' + reachedEnd,250,20);
+}
+
+function write(words,x,y) {
+    ctx.save();
+    ctx.font = '12px Arial';
+    ctx.fillStyle = 'black';
+    ctx.fillText(words,x,y);
+    ctx.restore();
+}
+</script>
+</html>
